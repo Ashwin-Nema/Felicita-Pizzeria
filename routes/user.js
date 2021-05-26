@@ -19,6 +19,10 @@ user_router.use(session({
     store:store
 }))
 
+user_router.get('/login', (req, res) => {
+    res.render('login')
+})
+
 user_router.post('/signup', async (req, res) => {
     req.session.hello = true
     const verifyemail = await verify_email(req.body.email)
@@ -42,8 +46,22 @@ user_router.post('/signup', async (req, res) => {
 user_router.post('/login', async (req, res)=> {
     try {
         const user = await UserModel.findOne({email:req.body.email})
-        const isMatching = await 
+        const isMatching = await bcrypt.compare(req.body.password, user.password)
+        if (user != null && isMatching) {
+            req.session.isloggedin = true
+            req.session.user = user.name
+            return
+        }
+    } catch(error) {
+        console.log(error)
     }
+})
+
+user_router.post("/checkout", (req, res) => {
+    if (req.session.isloggedin) {
+        return
+    }
+    res.redirect('/login')
 })
 
 module.exports = user_router

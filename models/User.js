@@ -17,6 +17,9 @@ const UserSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    location:{
+        type:Array
+    },
     orders:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Order'
