@@ -1,0 +1,507 @@
+/* CSS Reset */
+*{
+    margin: 0;
+    padding: 0;
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+/* CSS Variables */
+:root{
+    --navbar-height: 59px;
+}
+
+/* Navigation Bar */
+#navbar{
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0px;
+}
+
+#navbar::before{
+    content: "";
+    background-color: black;
+    position: absolute;
+    top:0px;
+    left:0px;
+    height: 100%;
+    width:100%;
+    z-index: -1;
+    opacity: 0.7;
+}
+
+/* Navigation Bar: Logo and Image */
+#logo{
+    margin: 5px 5px;
+}
+
+#logo img{
+    height: 70px;
+    margin: 3px 4px;
+}
+
+
+/* Navigation Bar: List Styling */
+
+#navbar ul{
+    display: flex;
+    font-family:Georgia, 'Times New Roman', Times, serif;
+}
+
+#navbar ul li{ 
+    list-style: none;
+    font-size: 1.1rem;
+}
+
+#navbar ul li a{
+    color: white;
+    display: block;
+    padding: 3px 22px;
+    border-radius: 20px;
+    text-decoration: none;
+}
+
+#navbar ul li a:hover{
+    color: black;
+    background-color: white;
+}
+
+/*Carousel*/
+.custom-height {   
+    max-height: 550px;   
+}
+
+.image-col-1 {   
+    width: 100%;   
+    cursor: pointer;
+}
+
+.carousel {   
+    cursor: pointer;
+}
+
+
+/* Home Section */
+#home{
+    display: flex;
+    flex-direction: column;
+    padding:3px 200px;
+    height: 550px;
+    justify-content: center;
+    align-items: center;
+}
+
+#home::before{ 
+    content: "";
+    position: absolute;
+    background: url('../bg1.jpg') no-repeat center center/cover;
+    height: 500px;
+    top:800px;
+    left:0px;
+    width: 100%;
+    z-index: -1;
+    opacity:0.89;
+}
+
+#about h1{
+    color:white;
+    text-align: center;
+    font-family: 'Bree Serif', serif;
+}
+
+#home p{
+    color:white;
+    text-align: center;
+    font-size: 1.5rem;
+    font-family: 'Bree Serif', serif;
+}
+
+#about .btn,
+#contact-box .btn {
+    padding: 6px 20px;
+    border: 2px solid white;
+    background-color: brown;
+    color: white;
+    margin: 17px;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    cursor:pointer;
+}
+
+.center{
+    text-align: center;
+}
+
+
+/* Services Section */
+#services-container {
+    padding-top: 150px;
+}
+
+#services{
+    margin: 34px;
+    display: flex;
+}
+#services .box{ 
+    border: 2px solid brown;
+    padding: 34px;
+    margin: 2px 55px;
+    border-radius: 28px;
+    background: #f2f2f2;
+    margin-bottom: 20px;
+}
+
+#services .box img{ 
+   height: 160px;
+   margin: auto;
+   display: block;
+}
+
+#services .box p{
+    font-family: 'Bree Serif', serif;
+
+} 
+
+/*Menu*/
+
+.item-container {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+    left: 25px;
+}
+
+.pizza-gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-areas: 'item1 item1 item2 item3'
+                        'item4 item4 item2 item5'
+                        'item4 item4 item2 item6'
+                        'item3 item3 item5 item7'
+                        'item4 item5 item7 item8'
+                        'item9 item3 item4 item5'
+                        'item2 item3 item10 item8'
+                        'item7 item7 item8 item11'
+                        'item5 item5 item9 item12'
+                        'item6 item7 item8 item13'
+                        'item8 item9 item10 item14'
+                        'item9 item10 item11 item15'
+                        'item10 item14 item12 item16';
+    grid-gap: 10px;
+}
+
+.food-item {
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    background-position: center !important;
+    min-height: 12rem;
+    cursor: pointer;
+    background:#fff;
+    border-radius: 15px;
+    padding : 5px;
+    padding-bottom: 50px;
+    z-index: -1;
+}
+
+a {
+    text-decoration: none;
+}
+
+.items {
+    left: 5px;
+    bottom: 55px;
+    width: 280px;
+    justify-content: space-between;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 2);
+    border-radius:15px;
+    overflow: hidden;
+    cursor: pointer;
+    transform: scale(1);
+}
+
+.food-item-img {
+    height: 150px;
+    position: relative;
+}
+
+.food-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    box-sizing: border-box;
+}
+
+.detail-box {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    font-family: calibri;
+}
+
+.type {
+    display: flex;
+    flex-direction: column;
+}
+
+.type a {
+    color: #222222;
+    margin: 5px 0px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding-right: 8px;
+}
+
+.type span {
+    color: rgba(26, 26, 26, 0.5);
+}
+
+.cart {
+    display: flex;
+    flex-direction: column;
+}
+
+.cart a {
+    color: #222222;
+    margin: 5px 0px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding-right: 8px;
+}
+
+.cart span {
+    color: rgba(26, 26, 26, 0.5);
+}
+
+.price {
+    color: #333333;
+    font-weight: 600;
+    font-size: 1.1rem;
+    font-family: poppins;
+    letter-spacing: 0.5px;
+}
+
+.button {
+    padding: 5px 10px;
+    border: 1px solid white;
+    background-color: brown;
+    color: white;
+    margin: 6px;
+    font-size: 10px;
+    border-radius: 10px;
+    cursor:pointer;
+}
+
+.items:hover {
+    visibility: visible;
+    transform: scale(0.9);
+    transition-duration: 5s;
+}
+
+#veg-pizza, #non-veg-pizza,
+#beverages, #desserts {
+    padding: 100px;
+
+}
+
+.carousel-control-next,
+.carousel-control-prev {   
+    transition: 0.1s;
+}
+
+@keyframes fade {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .pizza-gallery {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-areas: "item1 item1 item2"
+                            "item3 item4 item2"
+                            "item5 item6 item2"
+                            "item7 item4 item3"
+                            "item6 item8 item5"
+                            "item9 item6 item8"
+                            "item9 item10 item5"
+                            "item11 item7 item1"
+                            "item2 item12 item7"
+                            "item3 item13 item10"
+                            "item7 item14 item9"
+                            "item8 item15 item12"
+                            "item11 item16 item7";
+    }
+    .form-container {
+        background:#fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px 0px #000;
+        margin: 50px 35px 35px 50px;
+    } 
+}
+
+
+@media (max-width: 620px) {
+    .pizza-gallery {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "item1 item3"
+                            "item5 item4"
+                            "item2 item5"
+                            "item2 item6"
+                            "item3 item7"
+                            "item3 item8"
+                            "item4 item9"
+                            "item4 item10"
+                            "item5 item11"
+                            "item6 item12"
+                            "item8 item13"
+                            "item10 item14"
+                            "item13 item15"
+                            "item15 item16";
+    }
+    .form-container {
+        background:#fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px 0px #000;
+        margin: 50px 35px 35px 50px;
+    } 
+}
+
+
+@media (max-width: 360px) {
+    .pizza-gallery {
+        grid-template-columns: 1fr;
+        grid-template-areas: "item1" 
+                            "item2"
+                            "item3"
+                            "item4"
+                            "item5" 
+                            "item6"
+                            "item7"
+                            "item8"
+                            "item9"
+                            "item10"
+                            "item11"
+                            "item12"
+                            "item13"
+                            "item14"
+                            "item15"
+                            "item16";
+    }
+    .item2 {
+        background-position: top;
+    }
+    .form-container {
+        background:#fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px 0px #000;
+        margin: 50px 35px 35px 50px;
+    } 
+}
+
+/* Clients Section */
+#client-section{ 
+    position: relative;
+}
+
+#client-section::before{
+    content: "";
+    position: absolute;
+    background: url('../bg.jpg');
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.3;
+}
+
+#clients{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.client-item{
+    padding: 34px;
+    z-index: -1;
+}
+
+#clients img{
+    height: 124px;
+}
+
+
+/* Contact Section */
+#contact{
+    position: relative;
+}
+
+#contact::before{
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.7;
+    background: url('../contact.jpg') no-repeat center center/cover;
+}
+
+#contact-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 34px;
+}
+
+#contact-box input, 
+#contact-box textarea{
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 9px;
+    font-size: 1.1rem;
+} 
+
+#contact-box form{
+    width: 40%;
+    z-index: -1;
+}
+
+#contact-box label{
+   font-size: 1.3rem;
+   font-family: 'Bree Serif', serif;
+
+}
+
+
+footer{
+    background: black;
+    color: white;
+    padding: 9px 20px;
+}
+
+/* Utility Classes */
+.h-primary{
+    font-family: 'Bree Serif', serif;
+    font-size: 3.8rem;
+    padding: 12px;
+    z-index: -1;
+    padding-top: 15px;
+}
+
+.h-secondary{
+    font-family: 'Bree Serif', serif;
+    font-size: 2.3rem;
+    padding: 12px;
+}
+
