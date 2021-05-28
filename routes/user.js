@@ -19,27 +19,55 @@ user_router.use(session({
     store:store
 }))
 
+
+user_router.get('/', (req, res) => {
+    console.log(req.session.user)
+    if (req.session.isloggedin) {
+        res.render('home', req.session.user)
+        return
+    }
+    res.render('home')
+})
+
 user_router.get('/login', (req, res) => {
+    if (req.session.isloggedin) {
+        res.redirect("/")
+        return
+    }
     res.render('login')
 })
 
+user_router.get('/signup', (req, res) => {
+    if (req.session.isloggedin) {
+        res.redirect("/")
+        return
+    }
+    res.render("signup")
+})
+
 user_router.post('/signup', async (req, res) => {
-    req.session.hello = true
     const verifyemail = await verify_email(req.body.email)
-    const verifynumber = await verify_mobile_number(req.body.mobilenumber)
-    if (!verifyemail || !verifynumber) return
+    const verifynumber = await verify_mobile_number(req.body.mobile_number)
+    if (!verifyemail || !verifynumber || req.body.password != req.body.confirmpassword) {
+        res.render("signuperror")
+        return
+    }
+    delete req.body.confirmpassword
+   
     try {
         const salt = await bcrypt.genSalt(10)
         const hash = await bcrypt.hash(req.body.password, salt)
         req.body.password = hash
         const newuser = new UserModel(req.body)
         const finaluser = newuser.save()
-        res.json(user)
+        req.session.isloggedin = true
+        req.session.user = newuser
+        res.redirect("/")
         return
     } catch(error) {
         console.log(error)
     }
-    res.send("hello")
+    res.render("signuperror")
 })
 
 
@@ -49,12 +77,19 @@ user_router.post('/login', async (req, res)=> {
         const isMatching = await bcrypt.compare(req.body.password, user.password)
         if (user != null && isMatching) {
             req.session.isloggedin = true
-            req.session.user = user.name
+            req.session.user = user
+            res.redirect("/")
             return
         }
     } catch(error) {
         console.log(error)
     }
+    res.render('loginerror')
+})
+
+user_router.post('/logout', (req, res) => {
+    req.session.isloggedin = false
+    res.redirect("/")
 })
 
 user_router.post("/checkout", (req, res) => {

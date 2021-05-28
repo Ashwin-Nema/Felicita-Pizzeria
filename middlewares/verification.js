@@ -4,6 +4,7 @@ async function verify_mobile_number(number) {
     const regx = /^[7-9][0-9]{9}$/
     const user = await UserModel.findOne({mobile_number:number})
     if (!regx.test(number) || user) {
+        console.log(typeof number)
         return false
     }
     return true

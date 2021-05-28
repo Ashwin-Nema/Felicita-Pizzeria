@@ -6,6 +6,4 @@ async function cleardata() {
     await OrderModel.remove({})
 }
 
-async function deleteuser(email) {
-    
-}
+module.exports = {cleardata}

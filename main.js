@@ -6,10 +6,11 @@ const mongoose = require('mongoose');
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
 const user_router = require('./routes/user');
+const { cleardata } = require('./middlewares/seed');
 app.use(express.json());
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
-app.engine('hbs', expHbs({ extname: 'hbs' }))
+app.engine('hbs', expHbs({ extname: 'hbs' , defaultLayout:false}))
 app.set('view engine', 'hbs')
 const { DATABASE, SESSIONSECRET, SESSION } = process.env
 
@@ -33,6 +34,7 @@ mongoose.connect(DATABASE, {
 }, async (err) => {
     if (err) throw err
     console.log('Connected')
+    // cleardata()
 })
 
 app.use("", user_router)
