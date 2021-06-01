@@ -7,6 +7,7 @@ const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
 const { DATABASE, SESSIONSECRET, SESSION } = process.env
 const bcrypt = require('bcrypt')
+// const axios = require('axios')
 const store = new MongoDBStore({
     uri:DATABASE,
     collection:SESSION
@@ -20,16 +21,16 @@ user_router.use(session({
 }))
 
 
-user_router.get('/', (req, res) => {
-    console.log(req.session.user)
+user_router.get('/',async (req, res) => {
     if (req.session.isloggedin) {
         res.render('home', req.session.user)
         return
     }
+    console.log(req.session.user)
     res.render('home')
 })
 
-user_router.get('/login', (req, res) => {
+user_router.get('/login',async (req, res) => {
     if (req.session.isloggedin) {
         res.redirect("/")
         return
@@ -53,7 +54,7 @@ user_router.post('/signup', async (req, res) => {
         return
     }
     delete req.body.confirmpassword
-   
+
     try {
         const salt = await bcrypt.genSalt(10)
         const hash = await bcrypt.hash(req.body.password, salt)
@@ -61,7 +62,7 @@ user_router.post('/signup', async (req, res) => {
         const newuser = new UserModel(req.body)
         const finaluser = newuser.save()
         req.session.isloggedin = true
-        req.session.user = newuser
+        req.session.user = req.body
         res.redirect("/")
         return
     } catch(error) {
@@ -77,7 +78,7 @@ user_router.post('/login', async (req, res)=> {
         const isMatching = await bcrypt.compare(req.body.password, user.password)
         if (user != null && isMatching) {
             req.session.isloggedin = true
-            req.session.user = user
+            req.session.user = {_id:user._id, name:user.name, mobile_number:user.mobile_number, email:user.email}
             res.redirect("/")
             return
         }
@@ -87,16 +88,65 @@ user_router.post('/login', async (req, res)=> {
     res.render('loginerror')
 })
 
-user_router.post('/logout', (req, res) => {
+user_router.post('/logout',async (req, res) => {
     req.session.isloggedin = false
     res.redirect("/")
 })
 
-user_router.post("/checkout", (req, res) => {
+user_router.post("/checkout",async (req, res) => {
     if (req.session.isloggedin) {
         return
     }
     res.redirect('/login')
+})
+
+user_router.post("/editprofile",async (req, res) => {
+    res.render('updateuser')
+})
+
+user_router.post('/updateuser',async (req, res) => {
+    if (req.body.password != req.body.confirmpassword) {
+        res.render('updateusererror')
+        return
+    }
+    const newobject = {}
+    if (req.body.name) {
+        newobject.name = req.body.name
+        req.session.user.name = req.body.name
+    }
+
+    if (req.body.email && verify_email(req.body.email)) {
+        newobject.email = req.body.email
+        req.session.user.email = req.body.email
+    }
+
+    if (req.body.mobile_number && verify_mobile_number(req.body.mobile_number)) {
+        newobject.mobile_number = req.body.mobile_number
+        req.session.user.mobile_number = req.body.mobile_number
+    }
+
+    if (req.body.password) {
+        newobject.password = req.body.password
+        req.session.user.password = req.body.password
+    }
+
+    if (Object.keys(newobject).length != 0) {
+        await UserModel.updateOne({_id:req.session.user._id}, {$set:newobject})
+    }
+    res.redirect("/")
+})
+
+user_router.post("/deleteuser",async (req, res) => {
+    req.session.isloggedin = false
+    await UserModel.deleteOne({_id:req.session.user._id})
+    req.session.destroy()
+    res.redirect("/")
+})
+
+user_router.post('/savelocation', (req, res) => {
+    console.log(req.body)
+
+    res.json({redirectUrl: "/"})
 })
 
 module.exports = user_router
