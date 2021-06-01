@@ -20,9 +20,11 @@ async function verify_email(email) {
     } catch(error) {
         return false
     }
+    
     const regx = /^([a-z0-9\.-]+)@([a-z0-9-]+).([a-z]{2,8})(.[a-z]{2,8})?$/
     if (!regx.test(email) || user) return false
     return true
 }
+
 
 module.exports = {verify_mobile_number, verify_email}

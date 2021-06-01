@@ -18,7 +18,8 @@ const UserSchema = new mongoose.Schema({
         required:true
     },
     location:{
-        type:Array
+        type:Array,
+        default:[18.952163, 72.803736]
     },
     orders:[{
         type:mongoose.Schema.Types.ObjectId,
