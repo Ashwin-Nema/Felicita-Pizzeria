@@ -111,10 +111,9 @@ order_router.post('/complete', async (req, res) => {
             }
         })
     }
-    req.session.gotanorder = false
     if (flag) {
         async function redirecttomainroute() {
-            res.redirect("/")
+            res.redirect("/paymentsuccess")
         }
         await redirecttomainroute()
     } else {
@@ -199,6 +198,15 @@ order_router.post("/dinein", (req, res) => {
     req.session.gotanorder = false
     if (req.session.isloggedin) {
         req.session.ordertype = "Dine in"
+    }
+    res.redirect("/")
+})
+
+order_router.get("/paymentsuccess",(req, res) => {
+    if (req.session.gotanorder) {
+        res.render("treansctionsuccessful")
+        req.session.gotanorder = false
+        return
     }
     res.redirect("/")
 })
