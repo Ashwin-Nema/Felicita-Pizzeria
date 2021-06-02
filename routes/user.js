@@ -30,6 +30,8 @@ user_router.get('/', async (req, res) => {
     if (can_edit_order) {
         res.render('home',{...req.session.user,...edit_order})
         return
+    } else {
+        req.session.editorder = false
     }
     res.render('home', req.session.user)
 

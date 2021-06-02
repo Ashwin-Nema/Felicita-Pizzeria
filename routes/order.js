@@ -85,9 +85,10 @@ order_router.get("/makepayment", (req, res) => {
 
 order_router.post('/complete', async (req, res) => {
     let flag = true
-   
+    
     if (req.session.gotanorder && req.session.isloggedin) {
         razorpay.payments.fetch(req.body.razorpay_payment_id).then(async (paymentDocument) => {
+           
             if (req.session.editorder) {
                 if (checkinglastordertime(req.session.user, Date.now())) {
                     let changes = { items: req.session.order, price: req.session.orderprice }
@@ -99,6 +100,7 @@ order_router.post('/complete', async (req, res) => {
                     flag = false
                 }
             }
+            
             else {
                 const customer = await UserModel.findById(req.session.user._id)
                 const order = { items: req.session.order, price: req.session.orderprice }
@@ -174,6 +176,7 @@ order_router.post("/editorder", (req, res) => {
 
 order_router.post("/deleteorder", async (req, res) => {
     req.session.gotanorder = false
+    req.session.editorder = false
     if (checkinglastordertime(req.session.user, Date.now())) {
         let order = await getlastorderid(req.session.user)
         let user = await UserModel.findById(req.session.user._id)
@@ -208,6 +211,11 @@ order_router.get("/paymentsuccess",(req, res) => {
         req.session.gotanorder = false
         return
     }
+    res.redirect("/")
+})
+
+order_router.post("/canceledit", (req, res) => {
+    req.session.editorder = false
     res.redirect("/")
 })
 
