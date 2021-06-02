@@ -6,27 +6,27 @@ order_router.use(express.urlencoded({ extended: true }))
 const session = require('express-session')
 const ItemModel = require('../models/items')
 const MongoDBStore = require('connect-mongodb-session')(session)
-const { DATABASE, SESSIONSECRET, SESSION,RAZORPAYKEY,RAZORPAYPASSWORD } = process.env
+const { DATABASE, SESSIONSECRET, SESSION, RAZORPAYKEY, RAZORPAYPASSWORD } = process.env
 const Razorpay = require('razorpay')
-const { orderpricecalculator } = require('../middlewares/miscellaneous')
+const { orderpricecalculator, checkinglastordertime, getlastorderid } = require('../middlewares/miscellaneous')
 const OrderModel = require('../models/order')
 const razorpay = new Razorpay({
     key_id: RAZORPAYKEY,
     key_secret: RAZORPAYPASSWORD
 })
 const store = new MongoDBStore({
-    uri:DATABASE,
-    collection:SESSION
+    uri: DATABASE,
+    collection: SESSION
 })
 
 order_router.use(session({
-    secret:SESSIONSECRET,
-    resave:false,
-    saveUninitialized:false,
-    store:store
+    secret: SESSIONSECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: store
 }))
 
-order_router.post("/placeorder",async (req, res) =>{
+order_router.post("/placeorder", async (req, res) => {
     req.session.gotanorder = false
 
     if (req.session.isloggedin) {
@@ -35,10 +35,10 @@ order_router.post("/placeorder",async (req, res) =>{
             const finalorder = await neworder.save()
             req.session.order = req.body
             req.session.gotanorder = true
-            await ItemModel.deleteOne({ _id: finalorder._id})
+            await ItemModel.deleteOne({ _id: finalorder._id })
             req.session.orderprice = orderpricecalculator(req.body)
-            res.json({ redirectUrl: "/makepayment"})
-        } catch(error) {
+            res.json({ redirectUrl: "/makepayment" })
+        } catch (error) {
             res.json({ redirectUrl: "/" })
         }
         return
@@ -57,29 +57,50 @@ order_router.get('/selectlocation', (req, res) => {
 
 order_router.get("/makepayment", (req, res) => {
     if (req.session.gotanorder && req.session.isloggedin) {
-        res.render('payment', {amount:req.session.orderprice,name:req.session.user.name,mobile_number:req.session.user.mobile_number,email:req.session.user.email })
+        res.render('payment', { amount: req.session.orderprice, name: req.session.user.name, mobile_number: req.session.user.mobile_number, email: req.session.user.email })
         return
     }
     req.session.gotanorder = false
     res.redirect("/")
 })
 
-order_router.post('/complete',async (req, res) => {
+order_router.post('/complete', async (req, res) => {
+    let flag = true
+   
     if (req.session.gotanorder && req.session.isloggedin) {
         razorpay.payments.fetch(req.body.razorpay_payment_id).then(async (paymentDocument) => {
-            const customer = await UserModel.findById(req.session.user._id)
-            const order = {items:req.session.order, price:req.session.orderprice}
-            if (req.session.ordertype) order.ordertype = req.session.ordertype
-            const finalorder = await OrderModel.create(order)
-            finalorder.Customer = customer
-            await finalorder.save()
-            customer.orders.push(finalorder)
-            await customer.save()
-            flag = true
+            if (req.session.editorder) {
+                if (checkinglastordertime(req.session.user, Date.now())) {
+                    let changes = { items: req.session.order, price: req.session.orderprice }
+                    if (req.session.ordertype) changes.ordertype = req.session.ordertype
+                    let order = await getlastorderid(req.session.user)
+                    await OrderModel.updateOne({ _id: order }, changes)
+                } 
+                else {
+                    flag = false
+                }
+            }
+            else {
+                const customer = await UserModel.findById(req.session.user._id)
+                const order = { items: req.session.order, price: req.session.orderprice }
+                if (req.session.ordertype) order.ordertype = req.session.ordertype
+                const finalorder = await OrderModel.create(order)
+                finalorder.Customer = customer
+                await finalorder.save()
+                customer.orders.push(finalorder)
+                await customer.save()
+            }
         })
     }
     req.session.gotanorder = false
-    res.redirect("/")
+    if (flag) {
+        res.redirect("/")
+    } else {
+        req.session.editorder = false
+   
+        req.session.error = { edit: true }
+        res.redirect("/editordererror")
+    }
 })
 
 order_router.post('/order', (req, res) => {
@@ -92,12 +113,57 @@ order_router.post('/order', (req, res) => {
         razorpay.orders.create(options, (err, order) => {
             res.json(order)
         })
-    
+
         return
     }
     else {
         res.redirect("/")
     }
+})
+
+order_router.get("/editordererror", (req, res) => {
+    req.session.gotanorder = false
+    if (req.session.error) {
+        res.render('editdeleteerror', req.session.error)
+        req.session.error = null
+        return
+    }
+    res.redirect("/")
+})
+
+order_router.get("/deleteordererror", (req, res) => {
+    req.session.gotanorder = false
+    if (req.session.error) {
+        res.render('editdeleteerror', req.session.error)
+        req.session.error = null
+        return
+    }
+    res.redirect("/")
+})
+
+order_router.post("/editorder", (req, res) => {
+    req.session.gotanorder = false
+    if (checkinglastordertime(req.session.user, Date.now())) {
+        req.session.editorder = true
+        res.redirect('/')
+        return
+    }
+    req.session.error = { edit: true }
+    res.redirect("/editordererror")
+})
+
+order_router.post("/deleteorder", async (req, res) => {
+    req.session.gotanorder = false
+    if (checkinglastordertime(req.session.user, Date.now())) {
+        let order = await getlastorderid(req.session.user)
+        let user = await UserModel.findById(req.session.user._id)
+        await OrderModel.deleteOne({ _id: order })
+        await UserModel.updateOne({_id:req.session.user._id}, {$pull: {orders:order}})
+        res.redirect("/")
+        return
+    }
+    req.session.error = { delete: true }
+    res.redirect("/deleteordererror")
 })
 
 module.exports = order_router

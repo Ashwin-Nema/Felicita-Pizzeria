@@ -6,7 +6,6 @@ let enail = document.getElementById("email")
 let mobile = document.getElementById("mobile")
 
 axios.post('/order').then((info) => {
-    console.log(info)
 
     var options = {
         "key": "rzp_test_lYaL0slH0VoZzj", // Enter the Key ID generated from the Dashboard

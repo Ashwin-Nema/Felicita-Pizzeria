@@ -1,6 +1,7 @@
 const express = require('express')
 const { verify_email, verify_mobile_number } = require('../middlewares/verification')
 require('dotenv').config()
+const { checkinglastordertime } = require('../middlewares/miscellaneous')
 const UserModel = require('../models/User')
 const user_router = express.Router()
 user_router.use(express.urlencoded({ extended: true }))
@@ -24,11 +25,11 @@ user_router.use(session({
 
 user_router.get('/', async (req, res) => {
     req.session.gotanorder = false
-    if (req.session.user) {
-        // let finaluser = await UserModel.findOne({_id:req.session.user._id})
-        // let order = await OrderModel.findOne({_id: finaluser.orders[finaluser.orders.length - 1]})
-        // let time = order.createdAT.getTime()
-        
+    let edit_order = {edit:true}
+    let can_edit_order = await checkinglastordertime(req.session.user, Date.now()) 
+    if (can_edit_order) {
+        res.render('home',{...req.session.user,...edit_order})
+        return
     }
     res.render('home', req.session.user)
 
@@ -44,7 +45,6 @@ user_router.get('/login', async (req, res) => {
 })
 
 user_router.get('/signup', (req, res) => {
-    console.log(req.session)
     req.session.gotanorder = false
     console.log(req.session.finalorder)
     if (req.session.isloggedin) {
@@ -56,6 +56,9 @@ user_router.get('/signup', (req, res) => {
 
 user_router.post('/signup', async (req, res) => {
     req.session.gotanorder = false
+    req.session.editorder = false
+    req.session.orderprice = null
+    req.session.ordertype = null
     if (req.session.isloggedin) {
         res.redirect("/")
         return
@@ -86,6 +89,9 @@ user_router.post('/signup', async (req, res) => {
 
 
 user_router.post('/login', async (req, res) => {
+    req.session.editorder = false
+    req.session.orderprice = null
+    req.session.ordertype = null
     req.session.gotanorder = false
     if (!req.session.isloggedin) {
         try {
@@ -110,9 +116,9 @@ user_router.post('/logout', async (req, res) => {
     req.session.gotanorder = false
     req.session.isloggedin = false
     req.session.user = null
-    req.session.editorder = null
     req.session.orderprice = null
     req.session.ordertype = null
+    req.session.editorder = null
     res.redirect("/")
 })
 

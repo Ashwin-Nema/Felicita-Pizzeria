@@ -59,9 +59,22 @@
                 </form>
             </div>
         </div>
-        {{#if editorder}}
-        <a>dfsdfs</a>
-        {{/if}}
+        {{#if edit}}
+        <div class="dropdown">
+            <button class="dropbtn">Change current order
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+                <form method="post" action="/editorder">
+                    <a onclick="this.parentNode.submit();">Edit order</a>
+                </form>
+
+                <form method="post" action="/deleteorder">
+                    <a onclick="this.parentNode.submit();">Delete order</a>
+                </form>
+            </div>
+            {{/if}}
+        </div>
         {{else}}
         <a href="/login">Login</a>
         <a href="/signup">Sign Up</a>
