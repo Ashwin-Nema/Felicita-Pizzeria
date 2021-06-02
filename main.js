@@ -7,6 +7,9 @@ const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
 const user_router = require('./routes/user');
 const { cleardata } = require('./middlewares/seed');
+const UserModel = require('./models/User');
+const order_router = require('./routes/order');
+const OrderModel = require('./models/order');
 app.use(express.json());
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
@@ -34,9 +37,8 @@ mongoose.connect(DATABASE, {
 }, async (err) => {
     if (err) throw err
     console.log('Connected')
-    // cleardata()
 })
 
 app.use("", user_router)
-
+app.use("", order_router)
 app.listen(3000)
