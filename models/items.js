@@ -1,3 +1,5 @@
+// Validates whether the order given by the user is proper or not
+
 const mongoose = require('mongoose')
 const ItemSchema = new mongoose.Schema({
     peppypaneerpizza:{

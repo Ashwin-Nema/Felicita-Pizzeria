@@ -1,3 +1,5 @@
+// This is the format of the order given by the user
+
 const mongoose = require('mongoose')
 const OrderSchema = new mongoose.Schema({
     items:Object,

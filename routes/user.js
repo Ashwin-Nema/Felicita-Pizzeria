@@ -23,6 +23,7 @@ user_router.use(session({
     store: store
 }))
 
+//Renders the home page
 user_router.get('/', async (req, res) => {
     req.session.gotanorder = false
     let edit_order = {edit:true}
@@ -30,13 +31,15 @@ user_router.get('/', async (req, res) => {
     if (can_edit_order) {
         res.render('home',{...req.session.user,...edit_order})
         return
-    } else {
+    } 
+    else {
         req.session.editorder = false
     }
     res.render('home', req.session.user)
 
 })
 
+//Renders login page if user has not been logged in,else redirects to home page
 user_router.get('/login', async (req, res) => {
     req.session.gotanorder = false
     if (req.session.isloggedin) {
@@ -46,6 +49,7 @@ user_router.get('/login', async (req, res) => {
     res.render('login')
 })
 
+//Renders signup page if user has not been logged in,else redirects to home page
 user_router.get('/signup', (req, res) => {
     req.session.gotanorder = false
     if (req.session.isloggedin) {
@@ -55,6 +59,7 @@ user_router.get('/signup', (req, res) => {
     res.render("signup")
 })
 
+//Checks that the user details provided during signup are correct,then redirects user to home page
 user_router.post('/signup', async (req, res) => {
     req.session.gotanorder = false
     req.session.editorder = false
@@ -88,7 +93,7 @@ user_router.post('/signup', async (req, res) => {
     res.render("signuperror")
 })
 
-
+//Checks login details of the user then redirects to home page
 user_router.post('/login', async (req, res) => {
     req.session.editorder = false
     req.session.orderprice = null
@@ -113,6 +118,7 @@ user_router.post('/login', async (req, res) => {
     }
 })
 
+//Logs out user then redirects to home page
 user_router.post('/logout', async (req, res) => {
     req.session.gotanorder = false
     req.session.isloggedin = false
@@ -123,6 +129,7 @@ user_router.post('/logout', async (req, res) => {
     res.redirect("/")
 })
 
+// Renders edit profile page if user has signed in else redirects to home page
 
 user_router.post("/editprofile", async (req, res) => {
     req.session.gotanorder = false
@@ -132,6 +139,8 @@ user_router.post("/editprofile", async (req, res) => {
     }
     res.redirect("/")
 })
+
+// Checks that details provided ny the user during update are correct or not then redirects user to the home page
 
 user_router.post('/updateuser', async (req, res) => {
     req.session.gotanorder = false
@@ -170,6 +179,8 @@ user_router.post('/updateuser', async (req, res) => {
     }
 })
 
+// If the user has been logged in then user account is deleted after this redirects to main page
+
 user_router.post("/deleteuser", async (req, res) => {
     if (req.session.isloggedin) {
         req.session.isloggedin = false
@@ -179,6 +190,8 @@ user_router.post("/deleteuser", async (req, res) => {
     }
     res.redirect("/")
 })
+
+// Saves user location if user has been logged in, then redirects user to home page
 
 user_router.post('/savelocation',async (req, res) => {
     req.session.gotanorder = false

@@ -41,4 +41,4 @@ mongoose.connect(DATABASE, {
 
 app.use("", user_router)
 app.use("", order_router)
-app.listen(3000)
+app.listen(process.env.PORT || 3000)

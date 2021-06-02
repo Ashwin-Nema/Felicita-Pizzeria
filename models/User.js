@@ -1,3 +1,5 @@
+// Basic model for storing user details
+
 const mongoose = require('mongoose')
 
 const UserSchema = new mongoose.Schema({
