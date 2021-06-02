@@ -9,6 +9,7 @@ const user_router = require('./routes/user');
 const { cleardata } = require('./middlewares/seed');
 const UserModel = require('./models/User');
 const order_router = require('./routes/order');
+const OrderModel = require('./models/order');
 app.use(express.json());
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))

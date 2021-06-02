@@ -39,11 +39,41 @@
                     <a onclick="this.parentNode.submit();">Logout</a>
                 </form>
                 <a href="/selectlocation">Select location</a>
-                <a href="/selectordertype">Select order type</a>
                 <form method="post" action="/deleteuser">
                     <a onclick="this.parentNode.submit();">Delete Account</a>
                 </form>
             </div>
+        </div>
+
+        <div class="dropdown">
+            <button class="dropbtn">Select order type
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+                <form method="post" action="/homedelivery">
+                    <a onclick="this.parentNode.submit();">Home delivery</a>
+                </form>
+
+                <form method="post" action="/dinein">
+                    <a onclick="this.parentNode.submit();">Dine in</a>
+                </form>
+            </div>
+        </div>
+        {{#if edit}}
+        <div class="dropdown">
+            <button class="dropbtn">Change current order
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+                <form method="post" action="/editorder">
+                    <a onclick="this.parentNode.submit();">Edit order</a>
+                </form>
+
+                <form method="post" action="/deleteorder">
+                    <a onclick="this.parentNode.submit();">Cancel order</a>
+                </form>
+            </div>
+            {{/if}}
         </div>
         {{else}}
         <a href="/login">Login</a>
@@ -62,54 +92,58 @@
             or for dine in orders. You can choose order location, edit cancel order and change your profile details if
             you want </p>
     </div>
-    <form action="/placeorder" method="POST">
-        <div class="foodheader">
-            <h2>Veg Pizza</h2>
+
+    <div class="foodheader">
+        <h2>Veg Pizza</h2>
+    </div>
+
+    <div class="common" id="veg">
+        <div>
+            <h3>Peppy Paneer Pizza</h3>
+            <p>Price Rs395</p>
+            <img src="https://res.cloudinary.com/ash006/image/upload/v1622089450/peppy-paneer-pizza_sn9y2t.jpg">
+
+            <input type="number" id="peppypaneerpizza" name="peppypaneerpizza" min="0" max="20">
         </div>
 
-        <div class="common" id="veg">
-            <div>
-                <h3>Peppy Paneer Pizza</h3>
-                <p>Price Rs395</p>
-                <img src="https://res.cloudinary.com/ash006/image/upload/v1622089450/peppy-paneer-pizza_sn9y2t.jpg">
+        <div>
+            <h3>Cheese and corn pizza</h3>
+            <p>Price Rs305</p>
+            <img src="https://res.cloudinary.com/ash006/image/upload/v1622089245/cheese-and-corn-pizza_dsjho7.webp"
+                alt="">
+            <input type="number" id="cheeseandcornpizza" name="cheeseandcornpizza" min="0" max="20">
+        </div>
+    </div>
 
-                <input type="number" name="peppypaneerpizza" min="0" max="20">
-            </div>
+    <div class="foodheader">
+        <h2>Non-Veg Pizza</h2>
+    </div>
 
-            <div>
-                <h3>Cheese and corn pizza</h3>
-                <p>Price Rs305</p>
-                <img src="https://res.cloudinary.com/ash006/image/upload/v1622089245/cheese-and-corn-pizza_dsjho7.webp"
-                    alt="">
-                <input type="number" name="cheeseandcornpizza" min="0" max="20">
-            </div>
+    <div class="common" id="nonveg">
+        <div>
+            <h3>Chicken Sausage Pizza</h3>
+            <p>Price Rs305</p>
+            <img src="https://res.cloudinary.com/ash006/image/upload/v1622089406/chicken-sausage-pizza_vzcvlo.webp">
+            <input type="number" id="chickensausagepizza" name="chickensausagepizza" min="0" max="20">
         </div>
 
-        <div class="foodheader">
-            <h2>Non-Veg Pizza</h2>
+        <div>
+            <h3>Indian tandoori chicken tikka pizza</h3>
+            <p>Price Rs570</p>
+            <img src="https://res.cloudinary.com/ash006/image/upload/v1622089406/indian-tandoori-chicken-tikka-pizza_utlv06.webp"
+                alt="">
+            <input type="number" id="indiantandoorichickentikkapizza" name="indiantandoorichickentikkapizza" min="0"
+                max="20">
         </div>
+    </div>
 
-        <div class="common" id="nonveg">
-            <div>
-                <h3>Chicken Sausage Pizza</h3>
-                <p>Price Rs305</p>
-                <img src="https://res.cloudinary.com/ash006/image/upload/v1622089406/chicken-sausage-pizza_vzcvlo.webp">
-                <input type="number" name="chickensausagepizza" min="0" max="20">
-            </div>
-
-            <div>
-                <h3>Indian tandoori chicken tikka pizza</h3>
-                <p>Price Rs570</p>
-                <img src="https://res.cloudinary.com/ash006/image/upload/v1622089406/indian-tandoori-chicken-tikka-pizza_utlv06.webp"
-                    alt="">
-                <input type="number" name="indiantandoorichickentikkapizza" min="0" max="20">
-            </div>
-        </div>
-
-        <div class="foodheader">
-            <button type="submit">Place Order</button>
-        </div>
-    </form>
+    {{#if name}}
+    <div class="foodheader">
+        <button id="submitbutton" type="button">Place Order</button>
+    </div>
+    {{/if}}
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/home.js"></script>
 </body>
 
 </html>

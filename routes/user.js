@@ -1,6 +1,7 @@
 const express = require('express')
 const { verify_email, verify_mobile_number } = require('../middlewares/verification')
 require('dotenv').config()
+const { checkinglastordertime } = require('../middlewares/miscellaneous')
 const UserModel = require('../models/User')
 const user_router = express.Router()
 user_router.use(express.urlencoded({ extended: true }))
@@ -9,6 +10,7 @@ const MongoDBStore = require('connect-mongodb-session')(session)
 const { DATABASE, SESSIONSECRET, SESSION } = process.env
 const bcrypt = require('bcrypt')
 const axios = require('axios')
+const OrderModel = require('../models/order')
 const store = new MongoDBStore({
     uri: DATABASE,
     collection: SESSION
@@ -22,11 +24,19 @@ user_router.use(session({
 }))
 
 user_router.get('/', async (req, res) => {
+    req.session.gotanorder = false
+    let edit_order = {edit:true}
+    let can_edit_order = await checkinglastordertime(req.session.user, Date.now()) 
+    if (can_edit_order) {
+        res.render('home',{...req.session.user,...edit_order})
+        return
+    }
     res.render('home', req.session.user)
 
 })
 
 user_router.get('/login', async (req, res) => {
+    req.session.gotanorder = false
     if (req.session.isloggedin) {
         res.redirect("/")
         return
@@ -35,6 +45,8 @@ user_router.get('/login', async (req, res) => {
 })
 
 user_router.get('/signup', (req, res) => {
+    req.session.gotanorder = false
+    console.log(req.session.finalorder)
     if (req.session.isloggedin) {
         res.redirect("/")
         return
@@ -43,6 +55,10 @@ user_router.get('/signup', (req, res) => {
 })
 
 user_router.post('/signup', async (req, res) => {
+    req.session.gotanorder = false
+    req.session.editorder = false
+    req.session.orderprice = null
+    req.session.ordertype = null
     if (req.session.isloggedin) {
         res.redirect("/")
         return
@@ -62,7 +78,7 @@ user_router.post('/signup', async (req, res) => {
         const newuser = new UserModel(req.body)
         const finaluser = await newuser.save()
         req.session.isloggedin = true
-        req.session.user = { _id: finaluser._id, name: finaluser.name, mobile_number: finaluser.mobile_number, email: finaluser.email }
+        req.session.user = { _id: finaluser._id, name: finaluser.name, mobile_number: finaluser.mobile_number, email: finaluser.email}
         res.redirect("/")
         return
     } catch (error) {
@@ -73,13 +89,17 @@ user_router.post('/signup', async (req, res) => {
 
 
 user_router.post('/login', async (req, res) => {
+    req.session.editorder = false
+    req.session.orderprice = null
+    req.session.ordertype = null
+    req.session.gotanorder = false
     if (!req.session.isloggedin) {
         try {
             const user = await UserModel.findOne({ email: req.body.email })
             const isMatching = await bcrypt.compare(req.body.password, user.password)
             if (user != null && isMatching) {
                 req.session.isloggedin = true
-                req.session.user = { _id: user._id, name: user.name, mobile_number: user.mobile_number, email: user.email }
+                req.session.user = { _id: user._id, name: user.name, mobile_number: user.mobile_number, email: user.email}
                 res.redirect("/")
                 return
             }
@@ -93,13 +113,18 @@ user_router.post('/login', async (req, res) => {
 })
 
 user_router.post('/logout', async (req, res) => {
+    req.session.gotanorder = false
     req.session.isloggedin = false
     req.session.user = null
+    req.session.orderprice = null
+    req.session.ordertype = null
+    req.session.editorder = null
     res.redirect("/")
 })
 
 
 user_router.post("/editprofile", async (req, res) => {
+    req.session.gotanorder = false
     if (req.session.isloggedin) {
         res.render('updateuser')
         return
@@ -108,6 +133,7 @@ user_router.post("/editprofile", async (req, res) => {
 })
 
 user_router.post('/updateuser', async (req, res) => {
+    req.session.gotanorder = false
     if (req.session.isloggedin) {
         if (req.body.password != req.body.confirmpassword) {
             res.render('updateusererror')
@@ -147,12 +173,14 @@ user_router.post("/deleteuser", async (req, res) => {
     if (req.session.isloggedin) {
         req.session.isloggedin = false
         await UserModel.deleteOne({ _id: req.session.user._id })
+        await OrderModel.deleteMany({Customer: req.session.user._id})
         req.session.destroy()
     }
     res.redirect("/")
 })
 
 user_router.post('/savelocation', (req, res) => {
+    req.session.gotanorder = false
     console.log(req.body)
 
     res.json({ redirectUrl: "/" })
