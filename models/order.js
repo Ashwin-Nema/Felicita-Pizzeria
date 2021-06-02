@@ -1,10 +1,18 @@
 const mongoose = require('mongoose')
 const OrderSchema = new mongoose.Schema({
-    items:Array,
+    items:Object,
     price:Number,
+    ordertype:{
+        type:String,
+        default:"Home delivery"
+    },
     Customer:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
+    },
+    createdAT:{
+        type:Date,
+        default:Date.now
     }
 })
 
