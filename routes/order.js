@@ -97,34 +97,42 @@ order_router.get("/makepayment", (req, res) => {
 order_router.post('/complete', async (req, res) => {
     let flag = true
 
+    if (req.session.editorder == true) {
+        let time = await checkinglastordertime(req.session.user, Date.now()) 
+        if (time == false) {
+            flag = false
+        }
+    }
+
     if (req.session.gotanorder && req.session.isloggedin) {
         razorpay.payments.fetch(req.body.razorpay_payment_id).then(async (paymentDocument) => {
 
-            if (req.session.editorder) {
-                if (checkinglastordertime(req.session.user, Date.now())) {
+            if (flag == true) {
+                if (req.session.editorder == true) {
                     let changes = { items: req.session.order, price: req.session.orderprice }
                     if (req.session.ordertype) changes.ordertype = req.session.ordertype
                     let order = await getlastorderid(req.session.user)
                     await OrderModel.updateOne({ _id: order }, changes)
                 }
                 else {
-                    flag = false
+                    const customer = await UserModel.findById(req.session.user._id)
+                    const order = { items: req.session.order, price: req.session.orderprice }
+                    if (req.session.ordertype) order.ordertype = req.session.ordertype
+                    const finalorder = await OrderModel.create(order)
+                    finalorder.Customer = customer
+                    await finalorder.save()
+                    customer.orders.push(finalorder)
+                    await customer.save()
                 }
             }
-
-            else {
-                const customer = await UserModel.findById(req.session.user._id)
-                const order = { items: req.session.order, price: req.session.orderprice }
-                if (req.session.ordertype) order.ordertype = req.session.ordertype
-                const finalorder = await OrderModel.create(order)
-                finalorder.Customer = customer
-                await finalorder.save()
-                customer.orders.push(finalorder)
-                await customer.save()
-            }
         })
+
     }
-    if (flag) {
+    else {
+        flag = false
+    }
+
+    if (flag == true) {
         async function redirecttomainroute() {
             res.redirect("/paymentsuccess")
         }
@@ -182,13 +190,15 @@ order_router.get("/deleteordererror", (req, res) => {
 
 // Allows user to edit order if the time for editing it is not over,else redirects to error page
 
-order_router.post("/editorder", (req, res) => {
+order_router.post("/editorder",async (req, res) => {
     req.session.gotanorder = false
-    if (checkinglastordertime(req.session.user, Date.now())) {
+    let time = await checkinglastordertime(req.session.user, Date.now())
+    if (time == true) {
         req.session.editorder = true
         res.redirect('/')
         return
     }
+    console.log("hello")
     req.session.error = { edit: true }
     res.redirect("/editordererror")
 })
@@ -198,7 +208,8 @@ order_router.post("/editorder", (req, res) => {
 order_router.post("/deleteorder", async (req, res) => {
     req.session.gotanorder = false
     req.session.editorder = false
-    if (checkinglastordertime(req.session.user, Date.now())) {
+    let time = await checkinglastordertime(req.session.user, Date.now())
+    if (time == true) {
         let order = await getlastorderid(req.session.user)
         let user = await UserModel.findById(req.session.user._id)
         await OrderModel.deleteOne({ _id: order })

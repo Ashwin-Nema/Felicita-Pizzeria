@@ -1,24 +1,16 @@
 {
-  "name": "backend-project-ashwin-nema-au16",
+  "name": "felicita-pizeeria",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "node  main.js"
+    "start": "node main.js"
   },
   "engines": {
     "node": "14.x"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/attainu/backend-project-ashwin-nema-au16.git"
-  },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/attainu/backend-project-ashwin-nema-au16/issues"
-  },
-  "homepage": "https://github.com/attainu/backend-project-ashwin-nema-au16#readme",
   "dependencies": {
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
